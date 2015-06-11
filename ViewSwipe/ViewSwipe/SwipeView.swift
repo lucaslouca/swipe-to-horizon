@@ -11,12 +11,13 @@ import UIKit
 class SwipeView: UIView {
     var panGestureRecognizer : UIPanGestureRecognizer!
     var originalPoint:CGPoint!
-
+    var lastYDistance: CGFloat!
+    
     override init (frame : CGRect) {
         super.init(frame : frame)
         self.setup()
     }
-
+    
     func setup() {
         self.panGestureRecognizer = UIPanGestureRecognizer(target: self, action: Selector("swiped:"))
         self.addGestureRecognizer(panGestureRecognizer)
@@ -55,12 +56,19 @@ class SwipeView: UIView {
             self.originalPoint = self.center
             shouldShowShadow(true)
         case UIGestureRecognizerState.Changed:
-            let rotationAngel:CGFloat = (70.0*CGFloat(M_PI)*CGFloat(rotationStrength) / 180.00)
-            var rotationAndPerspectiveTransform: CATransform3D = CATransform3DIdentity
-            rotationAndPerspectiveTransform.m34 = 1.0 / -500
-            rotationAndPerspectiveTransform = CATransform3DRotate(rotationAndPerspectiveTransform, rotationAngel, CGFloat(1.0), CGFloat(0.0), CGFloat(0.0))
-            rotationAndPerspectiveTransform = CATransform3DTranslate(rotationAndPerspectiveTransform, 0, yDistance, 0)
-            self.layer.transform = rotationAndPerspectiveTransform
+            if (yDistance < 0 ) {
+                let rotationAngel:CGFloat = (70.0*CGFloat(M_PI)*CGFloat(rotationStrength) / 180.00)
+                var rotationAndPerspectiveTransform: CATransform3D = CATransform3DIdentity
+                rotationAndPerspectiveTransform.m34 = 1.0 / -500
+                rotationAndPerspectiveTransform = CATransform3DRotate(rotationAndPerspectiveTransform, rotationAngel, CGFloat(1.0), CGFloat(0.0), CGFloat(0.0))
+                if yDistance > -CGFloat.max {
+                    lastYDistance = yDistance
+                    rotationAndPerspectiveTransform = CATransform3DTranslate(rotationAndPerspectiveTransform, 0, yDistance, 0)
+                } else {
+                    rotationAndPerspectiveTransform = CATransform3DTranslate(rotationAndPerspectiveTransform, 0, lastYDistance, 0)
+                }
+                self.layer.transform = rotationAndPerspectiveTransform
+            }
         case UIGestureRecognizerState.Ended:
             if rotationStrength == 1 {
                 removeViewFromParentWithAnimation()
@@ -96,7 +104,7 @@ class SwipeView: UIView {
             rotationAndPerspectiveTransform = CATransform3DTranslate(rotationAndPerspectiveTransform, 0, -10000, 0)
             self.layer.transform = rotationAndPerspectiveTransform
         }
-
+        
         UIView.animateWithDuration(0.5, animations: animations , completion: {success in self.removeFromSuperview()})
     }
     
