@@ -159,6 +159,7 @@
 		A0C65BE51B28ABDD006F284A /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftUpdateCheck = 0700;
 				LastUpgradeCheck = 0630;
 				ORGANIZATIONNAME = "Lucas Louca";
 				TargetAttributes = {
@@ -413,6 +414,7 @@
 				A0C65C0E1B28ABDD006F284A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		A0C65C0F1B28ABDD006F284A /* Build configuration list for PBXNativeTarget "ViewSwipeTests" */ = {
 			isa = XCConfigurationList;
@@ -421,6 +423,7 @@
 				A0C65C111B28ABDD006F284A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

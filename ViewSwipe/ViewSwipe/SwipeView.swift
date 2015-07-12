@@ -34,7 +34,7 @@ class SwipeView: UIView {
     /**
     Show/hide shadow.
     
-    :param: show Bool that if set to true enables the shadow on the view, else disables it.
+    - parameter show: Bool that if set to true enables the shadow on the view, else disables it.
     */
     func shouldShowShadow(show:Bool){
         if (show) {
