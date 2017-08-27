@@ -17,26 +17,27 @@ class SwipeView: UIView {
         super.init(frame : frame)
         self.setup()
     }
+	
+	required init?(coder aDecoder: NSCoder) {
+		super.init(coder: aDecoder)
+		self.setup()
+	}
     
     func setup() {
-        self.panGestureRecognizer = UIPanGestureRecognizer(target: self, action: Selector("swiped:"))
+        self.panGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(SwipeView.swiped(_:)))
         self.addGestureRecognizer(panGestureRecognizer)
         
-        self.layer.shadowOffset = CGSizeMake(0.0, 5.00)
+        self.layer.shadowOffset = CGSize(width: 0.0, height: 5.00)
         self.layer.shadowRadius = 5
     }
     
-    required init(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-        self.setup()
-    }
     
     /**
     Show/hide shadow.
     
     - parameter show: Bool that if set to true enables the shadow on the view, else disables it.
     */
-    func shouldShowShadow(show:Bool){
+    func shouldShowShadow(_ show:Bool){
         if (show) {
             self.layer.shadowOpacity = 0.5
         } else {
@@ -47,21 +48,21 @@ class SwipeView: UIView {
     /**
     Called on pan gesture
     */
-    func swiped(gestureRecognizer: UIPanGestureRecognizer) {
-        let yDistance:CGFloat = gestureRecognizer.translationInView(self).y
+    func swiped(_ gestureRecognizer: UIPanGestureRecognizer) {
+        let yDistance:CGFloat = gestureRecognizer.translation(in: self).y
         let rotationStrength:CGFloat = min(abs(yDistance/360),1)
         
         switch(gestureRecognizer.state){
-        case UIGestureRecognizerState.Began:
+        case UIGestureRecognizerState.began:
             self.originalPoint = self.center
             shouldShowShadow(true)
-        case UIGestureRecognizerState.Changed:
+        case UIGestureRecognizerState.changed:
             if (yDistance < 0 ) {
-                let rotationAngel:CGFloat = (70.0*CGFloat(M_PI)*CGFloat(rotationStrength) / 180.00)
+                let rotationAngel:CGFloat = (70.0*CGFloat(Double.pi)*CGFloat(rotationStrength) / 180.00)
                 var rotationAndPerspectiveTransform: CATransform3D = CATransform3DIdentity
                 rotationAndPerspectiveTransform.m34 = 1.0 / -500
                 rotationAndPerspectiveTransform = CATransform3DRotate(rotationAndPerspectiveTransform, rotationAngel, CGFloat(1.0), CGFloat(0.0), CGFloat(0.0))
-                if yDistance > -CGFloat.max {
+                if yDistance > -CGFloat.greatestFiniteMagnitude {
                     lastYDistance = yDistance
                     rotationAndPerspectiveTransform = CATransform3DTranslate(rotationAndPerspectiveTransform, 0, yDistance, 0)
                 } else {
@@ -69,7 +70,7 @@ class SwipeView: UIView {
                 }
                 self.layer.transform = rotationAndPerspectiveTransform
             }
-        case UIGestureRecognizerState.Ended:
+        case UIGestureRecognizerState.ended:
             if rotationStrength == 1 {
                 removeViewFromParentWithAnimation()
             } else {
@@ -84,9 +85,9 @@ class SwipeView: UIView {
     Move view back to its original position
     */
     func resetViewPositionAndTransformations(){
-        UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.0, options: .CurveEaseInOut, animations: {
+        UIView.animate(withDuration: 0.5, delay: 0.0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.0, options: UIViewAnimationOptions(), animations: {
             self.center = self.originalPoint
-            self.transform = CGAffineTransformMakeRotation(0)
+            self.transform = CGAffineTransform(rotationAngle: 0)
             self.shouldShowShadow(false)
             }, completion: {success in })
     }
@@ -97,7 +98,7 @@ class SwipeView: UIView {
     func removeViewFromParentWithAnimation() {
         var animations:(()->Void)!
         animations = {
-            let rotationAngel:CGFloat = (70.0*CGFloat(M_PI) / 180.00)
+            let rotationAngel:CGFloat = (70.0*CGFloat(Double.pi) / 180.00)
             var rotationAndPerspectiveTransform: CATransform3D = CATransform3DIdentity
             rotationAndPerspectiveTransform.m34 = 1.0 / -500
             rotationAndPerspectiveTransform = CATransform3DRotate(rotationAndPerspectiveTransform, rotationAngel, CGFloat(1.0), CGFloat(0.0), CGFloat(0.0))
@@ -105,7 +106,7 @@ class SwipeView: UIView {
             self.layer.transform = rotationAndPerspectiveTransform
         }
         
-        UIView.animateWithDuration(0.5, animations: animations , completion: {success in self.removeFromSuperview()})
+        UIView.animate(withDuration: 0.5, animations: animations , completion: {success in self.removeFromSuperview()})
     }
     
 }
